@@ -34,6 +34,12 @@ class RCTBluetoothSerialService {
     private RCTBluetoothSerialModule mModule;
     private String mState;
 
+    private BluetoothAdapter mAdapter1;
+    private ConnectThread mConnectThread1;
+    private ConnectedThread mConnectedThread1;
+    private RCTBluetoothSerialModule mModule1;
+    private String mState1;
+
     // Constants that indicate the current connection state
     private static final String STATE_NONE = "none";       // we're doing nothing
     private static final String STATE_CONNECTING = "connecting"; // now initiating an outgoing connection
@@ -60,16 +66,23 @@ class RCTBluetoothSerialService {
     synchronized void connect(BluetoothDevice device) {
         if (D) Log.d(TAG, "connect to: " + device);
 
-        if (mState.equals(STATE_CONNECTING)) {
-            cancelConnectThread(); // Cancel any thread attempting to make a connection
-        }
+        // if (mState.equals(STATE_CONNECTING)) {
+        //     cancelConnectThread(); // Cancel any thread attempting to make a connection
+        // }
 
-        cancelConnectedThread(); // Cancel any thread currently running a connection
+        // cancelConnectedThread(); // Cancel any thread currently running a connection
 
         // Start the thread to connect with the given device
-        mConnectThread = new ConnectThread(device);
+        if (mConnectedThread == null) {
+            mConnectThread = new ConnectThread(device);
         mConnectThread.start();
         setState(STATE_CONNECTING);
+        } else {
+            mConnectThread1 = new ConnectThread(device);
+            mConnectThread1.start();
+            setState(STATE_CONNECTING);
+        }
+        
     }
 
     /**
